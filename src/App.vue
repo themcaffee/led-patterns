@@ -3,38 +3,65 @@
     <h2 class="text-center">LED Pattern Generator</h2>
     <br>
     <div class="row">
-      <form class="form-inline">
+      <form @submit.prevent="changeSize()" class="form-inline">
         <div class="col-5 form-group">
           <label class="col-5" for="height-input">Height</label>
-          <input type="text" class="form-control col-5" id="height-input" v-model.number="height" />
+          <input type="text" class="form-control col-5" id="height-input" v-model.number="heightInput" />
         </div>
         <div class="col-5 form-group">
           <label class="col-5" for="frames-input">Frames</label>
-          <input type="text" class="form-control col-5" id="frames-input" v-model.number="frames" />
+          <input type="text" class="form-control col-5" id="frames-input" v-model.number="framesInput" />
         </div>
-        <button class="col-2 btn btn-default" @click="changeSize()">Change Size</button>
+        <button class="col-2 btn btn-default" type="submit">New template</button>
       </form>
     </div>
-    <div v-for="frame in leds" :key="frame" class="row">
-      <div v-for="row in frame" :key="row">
-        <span class="led-box">&nbsp;</span>
+    <br>
+    <div v-if="gridInitialized">
+      <div class="row">
+        <span class="col-3">
+          <button class="btn btn-default" @click.prevent="addFrame()">Add Frame</button>
+        </span>
+        <span class="col-3">
+          <button class="btn btn-default" @click.prevent="addRow()">Add Row</button>
+        </span>
+      </div>
+      <br>
+      <div class="row">
+        <label class="col-2" for="color-input">Color</label>
+        <input class="form-control col-3" type="text" v-model="colorInput" id="color-input" />
+        <button class="btn btn-default col-2" @click.prevent="setBrushColor()">Set Color</button>
+        <span class="color-box" :style="{ background: brushColor }">&nbsp;</span>
+      </div>
+      <br>
+      <div v-for="row in leds.length" :key="row" class="row">
+        <span v-for="frame in leds[0].length" :key="frame">
+          <span class="led-box" :style="{ background: leds[row - 1][frame - 1] }" @click.prevent="setPixelColor(row - 1, frame - 1)">&nbsp;</span>
+        </span>
+      </div>
+      <br>
+      <h4>Output:</h4>
+      <div class="row">
+        {{ leds }}
       </div>
     </div>
+    <br>
+    <br>
   </div>
 </template>
 
 <style>
 .led-box {
-  height: 25px;
-  width: 25px;
-  background-color: #D3D3D3;
-  margin-left: 2px;
-  margin-right: 2px;
-  margin-top: 2px;
+  float: left;
+  height: 12px;
+  width: 12px;
   margin-bottom: 2px;
-  padding-left: 5px;
-  padding-right: 5px;
-  padding-bottom: 5px;
+  margin-left: 2px;
+}
+.color-box {
+  float: left;
+  height: 40px;
+  width: 40px;
+  margin-left: 2px;
 }
 </style>
 
@@ -43,26 +70,57 @@ export default {
   name: 'App',
   data () {
     return {
-      height: 49,
-      frames: 1,
-      leds: [[]]
+      heightInput: 49,
+      framesInput: 1,
+      height: 0,
+      frames: 0,
+      leds: [],
+      created: false,
+      colorInput: '#AAAAFF',
+      brushColor: '#AAAAFF'
     }
   },
 
-  mounted () {
-    this.changeSize()
+  computed: {
+    gridInitialized () {
+      return !(this.height === 0 || this.frames === 0)
+    }
   },
 
   methods: {
     changeSize () {
-      this.leds = []
-      for (var colIndex = 0; colIndex < this.frames; colIndex++) {
-        let col = []
-        for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
-          col.push('D3D3D3')
-        }
-        this.leds.push(col)
+      if (this.heightInput <= 0 || this.framesInput <= 0) {
+        return
       }
+      this.height = this.heightInput
+      this.frames = this.framesInput
+      this.leds = []
+      for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
+        let row = []
+        for (var colIndex = 0; colIndex < this.frames; colIndex++) {
+          row.push('#D3D3D3')
+        }
+        this.leds.push(row)
+      }
+    },
+    addFrame () {
+      for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
+        this.leds[rowIndex].push('#D3D3D3')
+      }
+    },
+    removeFrame () {
+      for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
+        this.leds[rowIndex].pop()
+      }
+    },
+    setPixelColor (row, frame) {
+      this.$set(this.leds[row], frame, this.brushColor)
+    },
+    setBrushColor () {
+      if (this.colorInput.length !== 7) {
+        return
+      }
+      this.brushColor = this.colorInput
     }
   }
 }
