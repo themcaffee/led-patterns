@@ -22,7 +22,7 @@
           <button class="btn btn-default" @click.prevent="addFrame()">Add Frame</button>
         </span>
         <span class="col-3">
-          <button class="btn btn-default" @click.prevent="addRow()">Add Row</button>
+          <button class="btn btn-default" @click.prevent="removeFrame()">Remove Frame</button>
         </span>
       </div>
       <br>
