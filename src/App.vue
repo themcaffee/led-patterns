@@ -27,6 +27,10 @@
       </div>
       <br>
       <div class="row">
+        <button class="btn btn-default col-3" @click="randomize()">Randomize</button>
+      </div>
+      <br>
+      <div class="row">
         <label class="col-2" for="color-input">Color</label>
         <input class="form-control col-3" type="text" v-model="colorInput" id="color-input" />
         <button class="btn btn-default col-2" @click.prevent="setBrushColor()">Set Color</button>
@@ -71,7 +75,7 @@ export default {
   data () {
     return {
       heightInput: 49,
-      framesInput: 1,
+      framesInput: 10,
       height: 0,
       frames: 0,
       leds: [],
@@ -121,6 +125,27 @@ export default {
         return
       }
       this.brushColor = this.colorInput
+    },
+    /*
+      Get a random hexadecimal color
+    */
+    getRandomColor () {
+      let letters = '0123456789ABCDEF'
+      let color = ''
+      for (var index = 0; index < 6; index++) {
+        color += letters[Math.floor(Math.random() * 16)]
+      }
+      return '#' + color
+    },
+    randomize () {
+      this.leds = []
+      for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
+        let row = []
+        for (var colIndex = 0; colIndex < this.frames; colIndex++) {
+          row.push(this.getRandomColor())
+        }
+        this.leds.push(row)
+      }
     }
   }
 }
