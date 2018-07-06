@@ -22,6 +22,16 @@
       </form>
     </div>
     <br>
+    <div v-if="gridInitialized" class="row">
+      <div class="form-inline">
+        <label class="col-2">Pixel Height</label>
+        <input type="text" class="form-control col-2" v-model.number="pixelHeight" />
+
+        <label class="offset-1 col-2">Pixel Width</label>
+        <input type="text" class="form-control col-2" v-model.number="pixelWidth" />
+      </div>
+    </div>
+    <br>
     <div v-if="gridInitialized">
       <div class="row">
         <div class="col-2">
@@ -37,24 +47,24 @@
         <div class="col-5">
           <input :class="{ displayNone: effectInput !== 'set-image' }" type="file" @change="filesChange($event.target.files)" accept="image/*"/>
         </div>
-        <div class="col-3" :class="{ displayNone: effectInput !== 'set-image' }">
+      </div>
+      <br>
+      <div class="row">
+        <sketch-picker v-model="colorInput" />
+        <div class="offset-2 col-3" :class="{ displayNone: effectInput !== 'set-image' }">
           <img ref="imageElement" :src="imageUrl" @load="imageLoaded($event.target)"/>
           <canvas ref="imageCanvas" id="image-canvas"></canvas>
         </div>
       </div>
       <br>
-      <div class="row">
-        <sketch-picker v-model="colorInput" />
-      </div>
-      <br>
       <div v-for="row in leds.length" :key="row" class="row">
         <span v-for="frame in leds[0].length" :key="frame">
-          <span class="led-box" :style="{ background: leds[row - 1][frame - 1] }" @mouseover.prevent="setPixelColor(row - 1, frame - 1)"></span>
+          <span class="led-box" :style="{ background: leds[row - 1][frame - 1], width: pixelWidth + 'px', height: pixelHeight + 'px' }" @mouseover.prevent="setPixelColor(row - 1, frame - 1)"></span>
         </span>
       </div>
       <br>
       <div class="row">
-        <button class="btn btn-default" @click="toggleShowOutput()">Toggle Show Output</button>
+        <button class="btn btn-default" @click="toggleShowOutput()">{{ showOutputText }}</button>
       </div>
       <div v-if="showOutput" class="row">
         <h4>Output:</h4>
@@ -139,13 +149,22 @@ export default {
         'a': 1
       },
       isMouseDown: false,
-      showOutput: false
+      showOutput: false,
+      pixelWidth: 12,
+      pixelHeight: 12
     }
   },
 
   computed: {
     gridInitialized () {
       return !(this.height === 0 || this.frames === 0)
+    },
+    showOutputText () {
+      if (this.showOutput) {
+        return 'Hide Output'
+      } else {
+        return 'Show Output'
+      }
     }
   },
 
