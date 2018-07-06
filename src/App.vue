@@ -47,11 +47,6 @@
         <div class="col-5">
           <input :class="{ displayNone: effectInput !== 'set-image' }" type="file" @change="filesChange($event.target.files)" accept="image/*"/>
         </div>
-        <div class="row">
-          <div class="col">
-            <i v-if="effectInput === 'set-image'">Due to an unknown bug, height and frames must be the same for images to work</i>
-          </div>
-        </div>
       </div>
       <br>
       <div class="row">
@@ -300,10 +295,10 @@ export default {
       console.log(imageData)
       let data = imageData.data
       this.imageHexData = []
-      for (var rowIndexA = 0; rowIndexA < this.imageHexHeight; rowIndexA++) {
+      for (var rowIndex = 0; rowIndex < this.imageHexHeight; rowIndex++) {
         let row = []
-        for (var colIndexA = 0; colIndexA < this.imageHexWidth; colIndexA++) {
-          let currentPixel = this.getColorIndexForCoord(rowIndexA, colIndexA, this.imageHexWidth)
+        for (var colIndex = 0; colIndex < this.imageHexWidth; colIndex++) {
+          let currentPixel = this.getColorIndexForCoord(colIndex, rowIndex, this.imageHexWidth)
           let r = data[currentPixel[0]]
           let g = data[currentPixel[1]]
           let b = data[currentPixel[2]]
@@ -326,7 +321,7 @@ export default {
       for (var rowIndex = 0; rowIndex < this.imageHexHeight; rowIndex++) {
         let row = []
         for (var colIndex = 0; colIndex < this.imageHexWidth; colIndex++) {
-          let currentPixel = this.imageHexData[colIndex][rowIndex]
+          let currentPixel = this.imageHexData[rowIndex][colIndex]
           row.push(currentPixel)
         }
         this.leds.push(row)
