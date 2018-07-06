@@ -1,45 +1,45 @@
 <template>
   <div class="container" id="app">
-    <h2 class="text-center">LED Pattern Generator</h2>
+    <br>
+    <div class="row">
+      <h2>LED Pattern Generator</h2>
+    </div>
     <br>
     <div class="row">
       <form @submit.prevent="changeSize()" class="form-inline">
-        <div class="col-5 form-group">
-          <label class="col-5" for="height-input">Height</label>
-          <input type="text" class="form-control col-5" id="height-input" v-model.number="heightInput" />
+        <label class="col-1" for="height-input">Height</label>
+        <input type="text" class="form-control col-2" id="height-input" v-model.number="heightInput" />
+
+        <label class="offset-1 col-1" for="frames-input">Frames</label>
+        <div class="input-group col-3">
+          <input type="text" class="form-control" id="frames-input" v-model.number="framesInput" />
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary" @click.prevent="addFrame()" type="button">+</button>
+            <button class="btn btn-outline-secondary" @click.prevent="removeFrame()" type="button">-</button>
+          </div>
         </div>
-        <div class="col-5 form-group">
-          <label class="col-5" for="frames-input">Frames</label>
-          <input type="text" class="form-control col-5" id="frames-input" v-model.number="framesInput" />
-        </div>
-        <button class="col-2 btn btn-default" type="submit">New template</button>
+        <button class="offset-1 col-2 btn btn-default" type="submit">New template</button>
       </form>
     </div>
     <br>
     <div v-if="gridInitialized">
       <div class="row">
-        <span class="col-3">
-          <button class="btn btn-default" @click.prevent="addFrame()">Add Frame</button>
-        </span>
-        <span class="col-3">
-          <button class="btn btn-default" @click.prevent="removeFrame()">Remove Frame</button>
-        </span>
-      </div>
-      <br>
-      <div class="row">
-        <span class="col-3">
-          <button class="btn btn-default" @click="randomize()">Randomize</button>
-        </span>
-        <span class="col-3">
-          <button class="btn btn-default" @click="randomShift()">Random Shift</button>
-        </span>
-      </div>
-      <br>
-      <div class="row">
-        <label class="col-2" for="color-input">Color</label>
-        <input class="form-control col-3" type="text" v-model="colorInput" id="color-input" />
-        <button class="btn btn-default col-2" @click.prevent="setBrushColor()">Set Color</button>
+        <div class="input-group col-3">
+          <input class="form-control " type="text" v-model="colorInput" id="color-input" />
+          <div class="input-group-append">
+            <button class="btn btn-default" @click.prevent="setBrushColor()" type="button">Set Color</button>
+          </div>
+        </div>
         <span class="color-box" :style="{ background: brushColor }">&nbsp;</span>
+
+        <div class="offset-1 col-2">
+          <select class="form-control" v-model="effectInput">
+            <option value="randomize">Randomize</option>
+            <option value="random-shift">Random Shift</option>
+          </select>
+        </div>
+
+        <button class="btn btn-default" @click="applyEffect()">Apply Effect</button>
       </div>
       <br>
       <div v-for="row in leds.length" :key="row" class="row">
@@ -48,9 +48,11 @@
         </span>
       </div>
       <br>
-      <h4>Output:</h4>
       <div class="row">
-        {{ leds }}
+        <h4>Output:</h4>
+        <div class="row">
+          {{ leds }}
+        </div>
       </div>
     </div>
     <br>
@@ -80,7 +82,8 @@ export default {
   data () {
     return {
       heightInput: 49,
-      framesInput: 10,
+      framesInput: 30,
+      effectInput: 'randomize',
       height: 0,
       frames: 0,
       leds: [],
@@ -113,11 +116,15 @@ export default {
       }
     },
     addFrame () {
+      this.frames += 1
+      this.framesInput += 1
       for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
         this.leds[rowIndex].push('#D3D3D3')
       }
     },
     removeFrame () {
+      this.frames -= 1
+      this.framesInput -= 1
       for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
         this.leds[rowIndex].pop()
       }
@@ -141,6 +148,13 @@ export default {
         color += letters[Math.floor(Math.random() * 16)]
       }
       return '#' + color
+    },
+    applyEffect () {
+      if (this.effectInput) {
+        this.randomize()
+      } else {
+        this.randomShift()
+      }
     },
     randomize () {
       this.leds = []
