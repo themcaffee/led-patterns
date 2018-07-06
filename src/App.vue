@@ -27,7 +27,12 @@
       </div>
       <br>
       <div class="row">
-        <button class="btn btn-default col-3" @click="randomize()">Randomize</button>
+        <span class="col-3">
+          <button class="btn btn-default" @click="randomize()">Randomize</button>
+        </span>
+        <span class="col-3">
+          <button class="btn btn-default" @click="randomShift()">Random Shift</button>
+        </span>
       </div>
       <br>
       <div class="row">
@@ -145,6 +150,35 @@ export default {
           row.push(this.getRandomColor())
         }
         this.leds.push(row)
+      }
+    },
+    randomShift () {
+      let newLeds = []
+      // Randomize the first frame
+      for (var firstRowIndex = 0; firstRowIndex < this.height; firstRowIndex++) {
+        let firstRow = []
+        firstRow.push(this.getRandomColor())
+        newLeds.push(firstRow)
+      }
+      console.log('1')
+      // Set the next frame with shifted pixels
+      for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
+        let row = []
+        for (var colIndex = 1; colIndex < this.frames; colIndex++) {
+          console.log(rowIndex + ' ' + colIndex)
+          if (rowIndex === this.height.length) {
+            row.push(this.getRandomColor())
+          } else {
+            let pastColor = this.leds[rowIndex + 1][colIndex - 1]
+            row.push(pastColor)
+          }
+        }
+        newLeds.push(row)
+      }
+      console.log('2')
+      for (var setRowIndex = 0; setRowIndex < this.height; setRowIndex++) {
+        console.log(setRowIndex)
+        this.$set(this.leds, rowIndex, newLeds[setRowIndex])
       }
     }
   }
