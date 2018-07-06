@@ -52,7 +52,7 @@
       <div class="row">
         <sketch-picker v-model="colorInput" />
         <div class="offset-2 col-3" :class="{ displayNone: effectInput !== 'set-image' }">
-          <img ref="imageElement" id="image-display" :src="imageUrl" @load="imageLoaded($event.target)"/>
+          <img ref="imageElement" id="image-display" :src="imageUrl" :class="{ displayNone: imageUrl === '' }" @load="imageLoaded($event.target)"/>
           <canvas ref="imageCanvas" id="image-canvas"></canvas>
         </div>
       </div>
@@ -68,9 +68,9 @@
       </div>
       <div v-if="showOutput" class="row">
         <h4>Output:</h4>
-        <div class="row">
+        <textarea class="form-control" rows="10">
           {{ leds }}
-        </div>
+        </textarea>
       </div>
     </div>
     <br>
