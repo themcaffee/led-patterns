@@ -52,7 +52,7 @@
       <div class="row">
         <sketch-picker v-model="colorInput" />
         <div class="offset-2 col-3" :class="{ displayNone: effectInput !== 'set-image' }">
-          <img ref="imageElement" :src="imageUrl" @load="imageLoaded($event.target)"/>
+          <img ref="imageElement" id="image-display" :src="imageUrl" @load="imageLoaded($event.target)"/>
           <canvas ref="imageCanvas" id="image-canvas"></canvas>
         </div>
       </div>
@@ -101,6 +101,10 @@
 }
 .displayNone {
   display: none;
+}
+#image-display {
+  height: 300px;
+  width: 300px;
 }
 </style>
 
