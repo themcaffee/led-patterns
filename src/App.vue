@@ -262,29 +262,24 @@ export default {
     imageLoaded (img) {
       // Once image loaded get the byte information using an invisible canvas
       let imageCanvas = this.$refs['imageCanvas']
-      imageCanvas.width = img.naturalWidth
-      imageCanvas.height = img.naturalHeight
-
-      let ctx = imageCanvas.getContext('2d')
-      ctx.drawImage(img, 0, 0)
-
-      let imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height)
+      imageCanvas.width = this.frames
+      this.framesInput = this.frames
+      imageCanvas.height = this.height
+      this.heightInput = this.height
       this.imageHexHeight = imageCanvas.height
       this.imageHexWidth = imageCanvas.width
+
+      let ctx = imageCanvas.getContext('2d')
+      ctx.drawImage(img, 0, 0, imageCanvas.width, imageCanvas.height)
+
+      let imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height)
+      console.log(imageData)
       let data = imageData.data
-      /*
-      for (var x = 0, len = data.length; x < len; x += 4) {
-        var r = data[x]
-        var g = data[x + 1]
-        var b = data[x + 2]
-        this.imageHexData.push(this.rgbToHex(r, g, b))
-      }
-      */
       this.imageHexData = []
-      for (var rowIndex = 0; rowIndex < this.imageHexHeight; rowIndex++) {
+      for (var rowIndexA = 0; rowIndexA < this.imageHexHeight; rowIndexA++) {
         let row = []
-        for (var colIndex = 0; colIndex < this.imageHexWidth; colIndex++) {
-          let currentPixel = this.getColorIndexForCoord(rowIndex, colIndex, this.imageHexWidth)
+        for (var colIndexA = 0; colIndexA < this.imageHexWidth; colIndexA++) {
+          let currentPixel = this.getColorIndexForCoord(rowIndexA, colIndexA, this.imageHexWidth)
           let r = data[currentPixel[0]]
           let g = data[currentPixel[1]]
           let b = data[currentPixel[2]]
@@ -304,9 +299,9 @@ export default {
     },
     setImage () {
       this.leds = []
-      for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
+      for (var rowIndex = 0; rowIndex < this.imageHexHeight; rowIndex++) {
         let row = []
-        for (var colIndex = 0; colIndex < this.frames; colIndex++) {
+        for (var colIndex = 0; colIndex < this.imageHexWidth; colIndex++) {
           let currentPixel = this.imageHexData[colIndex][rowIndex]
           row.push(currentPixel)
         }
