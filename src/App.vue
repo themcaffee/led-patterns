@@ -35,9 +35,9 @@
         <button class="col-2 btn btn-default" @click="applyEffect()">Apply Effect</button>
 
         <div class="col-5">
-          <input v-if="effectInput === 'set-image'" type="file" @change="filesChange($event.target.files)" accept="image/*"/>
+          <input :class="{ displayNone: effectInput !== 'set-image' }" type="file" @change="filesChange($event.target.files)" accept="image/*"/>
         </div>
-        <div class="col-3">
+        <div class="col-3" :class="{ displayNone: effectInput !== 'set-image' }">
           <img ref="imageElement" :src="imageUrl" @load="imageLoaded($event.target)"/>
           <canvas ref="imageCanvas" id="image-canvas"></canvas>
         </div>
@@ -54,6 +54,9 @@
       </div>
       <br>
       <div class="row">
+        <button class="btn btn-default" @click="toggleShowOutput()">Toggle Show Output</button>
+      </div>
+      <div v-if="showOutput" class="row">
         <h4>Output:</h4>
         <div class="row">
           {{ leds }}
@@ -84,6 +87,9 @@
   user-select: none;
 }
 #image-canvas {
+  display: none;
+}
+.displayNone {
   display: none;
 }
 </style>
@@ -132,7 +138,8 @@ export default {
         'source': 'hsva',
         'a': 1
       },
-      isMouseDown: false
+      isMouseDown: false,
+      showOutput: false
     }
   },
 
@@ -296,7 +303,6 @@ export default {
       return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b) + this.componentToHex(a)
     },
     setImage () {
-      console.log('setting image')
       this.leds = []
       for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
         let row = []
@@ -310,6 +316,9 @@ export default {
     getColorIndexForCoord (x, y, width) {
       let red = y * (width * 4) + x * 4
       return [red, red + 1, red + 2, red + 3]
+    },
+    toggleShowOutput () {
+      this.showOutput = !this.showOutput
     }
   },
 
