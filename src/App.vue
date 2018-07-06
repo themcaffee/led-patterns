@@ -47,6 +47,11 @@
         <div class="col-5">
           <input :class="{ displayNone: effectInput !== 'set-image' }" type="file" @change="filesChange($event.target.files)" accept="image/*"/>
         </div>
+        <div class="row">
+          <div class="col">
+            <i v-if="effectInput === 'set-image'">Due to an unknown bug, height and frames must be the same for images to work</i>
+          </div>
+        </div>
       </div>
       <br>
       <div class="row">
