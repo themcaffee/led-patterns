@@ -26,12 +26,21 @@
       <div class="row">
         <div class="col-2">
           <select class="form-control" v-model="effectInput">
+            <option value="set-image">Image</option>
             <option value="randomize">Randomize</option>
             <option value="random-shift">Random Shift</option>
           </select>
         </div>
 
-        <button class="btn btn-default" @click="applyEffect()">Apply Effect</button>
+        <button class="col-2 btn btn-default" @click="applyEffect()">Apply Effect</button>
+
+        <div class="col-5">
+          <input v-if="effectInput === 'set-image'" type="file" @change="filesChange($event.target.files)" accept="image/*"/>
+        </div>
+        <div class="col-3">
+          <img ref="imageElement" :src="imageUrl" @load="imageLoaded($event.target)"/>
+          <canvas ref="imageCanvas" id="image-canvas"></canvas>
+        </div>
       </div>
       <br>
       <div class="row">
@@ -74,6 +83,9 @@
   -ms-user-select: none;
   user-select: none;
 }
+#image-canvas {
+  display: none;
+}
 </style>
 
 <script>
@@ -83,9 +95,15 @@ export default {
   name: 'App',
   data () {
     return {
-      heightInput: 49,
-      framesInput: 30,
-      effectInput: 'randomize',
+      heightInput: 50,
+      framesInput: 50,
+      effectInput: 'set-image',
+      fileInput: '',
+      imageData: null,
+      imageHexData: [],
+      imageHexHeight: 0,
+      imageHexWidth: 0,
+      imageUrl: '',
       height: 0,
       frames: 0,
       leds: [],
@@ -177,10 +195,12 @@ export default {
       return '#' + color
     },
     applyEffect () {
-      if (this.effectInput) {
+      if (this.effectInput === 'randomize') {
         this.randomize()
-      } else {
+      } else if (this.effectInput === 'random-shift') {
         this.randomShift()
+      } else if (this.effectInput === 'set-image') {
+        this.setImage()
       }
     },
     randomize () {
@@ -221,6 +241,75 @@ export default {
         console.log(setRowIndex)
         this.$set(this.leds, rowIndex, newLeds[setRowIndex])
       }
+    },
+    filesChange (files) {
+      // Setup reader to get base64 image data
+      let reader = new FileReader()
+      reader.onload = this.fileReaderLoaded
+      reader.readAsDataURL(files[0])
+    },
+    fileReaderLoaded (event) {
+      // Use base64 image data to set image element data src
+      this.imageUrl = event.target.result
+    },
+    imageLoaded (img) {
+      // Once image loaded get the byte information using an invisible canvas
+      let imageCanvas = this.$refs['imageCanvas']
+      imageCanvas.width = img.naturalWidth
+      imageCanvas.height = img.naturalHeight
+
+      let ctx = imageCanvas.getContext('2d')
+      ctx.drawImage(img, 0, 0)
+
+      let imageData = ctx.getImageData(0, 0, imageCanvas.width, imageCanvas.height)
+      this.imageHexHeight = imageCanvas.height
+      this.imageHexWidth = imageCanvas.width
+      let data = imageData.data
+      /*
+      for (var x = 0, len = data.length; x < len; x += 4) {
+        var r = data[x]
+        var g = data[x + 1]
+        var b = data[x + 2]
+        this.imageHexData.push(this.rgbToHex(r, g, b))
+      }
+      */
+      this.imageHexData = []
+      for (var rowIndex = 0; rowIndex < this.imageHexHeight; rowIndex++) {
+        let row = []
+        for (var colIndex = 0; colIndex < this.imageHexWidth; colIndex++) {
+          let currentPixel = this.getColorIndexForCoord(rowIndex, colIndex, this.imageHexWidth)
+          let r = data[currentPixel[0]]
+          let g = data[currentPixel[1]]
+          let b = data[currentPixel[2]]
+          let a = data[currentPixel[3]]
+          let currentHex = this.rgbaToHex(r, g, b, a)
+          row.push(currentHex)
+        }
+        this.imageHexData.push(row)
+      }
+    },
+    componentToHex (c) {
+      let hex = c.toString(16)
+      return hex.length === 1 ? '0' + hex : hex
+    },
+    rgbaToHex (r, g, b, a) {
+      return '#' + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b) + this.componentToHex(a)
+    },
+    setImage () {
+      console.log('setting image')
+      this.leds = []
+      for (var rowIndex = 0; rowIndex < this.height; rowIndex++) {
+        let row = []
+        for (var colIndex = 0; colIndex < this.frames; colIndex++) {
+          let currentPixel = this.imageHexData[colIndex][rowIndex]
+          row.push(currentPixel)
+        }
+        this.leds.push(row)
+      }
+    },
+    getColorIndexForCoord (x, y, width) {
+      let red = y * (width * 4) + x * 4
+      return [red, red + 1, red + 2, red + 3]
     }
   },
 
