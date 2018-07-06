@@ -1,5 +1,5 @@
 <template>
-  <div class="container" id="app">
+  <div class="container" id="app" @mousedown.left="mouseDown()" @mouseup="mouseUp()">
     <br>
     <div class="row">
       <h2>LED Pattern Generator</h2>
@@ -24,15 +24,7 @@
     <br>
     <div v-if="gridInitialized">
       <div class="row">
-        <div class="input-group col-3">
-          <input class="form-control " type="text" v-model="colorInput" id="color-input" />
-          <div class="input-group-append">
-            <button class="btn btn-default" @click.prevent="setBrushColor()" type="button">Set Color</button>
-          </div>
-        </div>
-        <span class="color-box" :style="{ background: brushColor }">&nbsp;</span>
-
-        <div class="offset-1 col-2">
+        <div class="col-2">
           <select class="form-control" v-model="effectInput">
             <option value="randomize">Randomize</option>
             <option value="random-shift">Random Shift</option>
@@ -42,9 +34,13 @@
         <button class="btn btn-default" @click="applyEffect()">Apply Effect</button>
       </div>
       <br>
+      <div class="row">
+        <sketch-picker v-model="colorInput" />
+      </div>
+      <br>
       <div v-for="row in leds.length" :key="row" class="row">
         <span v-for="frame in leds[0].length" :key="frame">
-          <span class="led-box" :style="{ background: leds[row - 1][frame - 1] }" @click.prevent="setPixelColor(row - 1, frame - 1)">&nbsp;</span>
+          <span class="led-box" :style="{ background: leds[row - 1][frame - 1] }" @mouseover.prevent="setPixelColor(row - 1, frame - 1)"></span>
         </span>
       </div>
       <br>
@@ -67,16 +63,22 @@
   width: 12px;
   margin-bottom: 2px;
   margin-left: 2px;
-}
-.color-box {
-  float: left;
-  height: 40px;
-  width: 40px;
-  margin-left: 2px;
+  -moz-user-select: -moz-none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+
+  /*
+    Introduced in IE 10.
+    See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+  */
+  -ms-user-select: none;
+  user-select: none;
 }
 </style>
 
 <script>
+import { Sketch } from 'vue-color'
+
 export default {
   name: 'App',
   data () {
@@ -88,8 +90,31 @@ export default {
       frames: 0,
       leds: [],
       created: false,
-      colorInput: '#AAAAFF',
-      brushColor: '#AAAAFF'
+      colorInput: {
+        'hsl': {
+          'h': 240,
+          's': 1,
+          'l': 0.5,
+          'a': 1
+        },
+        'hex': '#0000FF',
+        'rgba': {
+          'r': 0,
+          'g': 0,
+          'b': 255,
+          'a': 1
+        },
+        'hsv': {
+          'h': 240,
+          's': 1,
+          'v': 1,
+          'a': 1
+        },
+        'oldHue': 240,
+        'source': 'hsva',
+        'a': 1
+      },
+      isMouseDown: false
     }
   },
 
@@ -100,6 +125,12 @@ export default {
   },
 
   methods: {
+    mouseDown () {
+      this.isMouseDown = true
+    },
+    mouseUp () {
+      this.isMouseDown = false
+    },
     changeSize () {
       if (this.heightInput <= 0 || this.framesInput <= 0) {
         return
@@ -130,13 +161,9 @@ export default {
       }
     },
     setPixelColor (row, frame) {
-      this.$set(this.leds[row], frame, this.brushColor)
-    },
-    setBrushColor () {
-      if (this.colorInput.length !== 7) {
-        return
+      if (this.isMouseDown) {
+        this.$set(this.leds[row], frame, this.colorInput.hex)
       }
-      this.brushColor = this.colorInput
     },
     /*
       Get a random hexadecimal color
@@ -195,6 +222,10 @@ export default {
         this.$set(this.leds, rowIndex, newLeds[setRowIndex])
       }
     }
+  },
+
+  components: {
+    'sketch-picker': Sketch
   }
 }
 </script>
