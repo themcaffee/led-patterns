@@ -1,6 +1,6 @@
 # led-patterns
 
-> Create patterns for LED strips
+Web application to easily create pixels of images or by painting with a cursor for use in a LED matrix. Has a configurable height and width and allows any image to be made into pixel art. 
 
 ## Build Setup
 
@@ -17,5 +17,3 @@ npm run build
 # build for production and view the bundle analyzer report
 npm run build --report
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).

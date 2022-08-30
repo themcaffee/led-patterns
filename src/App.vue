@@ -68,9 +68,7 @@
       </div>
       <div v-if="showOutput" class="row">
         <h4>Output:</h4>
-        <textarea class="form-control" rows="10">
-          {{ leds }}
-        </textarea>
+        <textarea class="form-control" rows="10" v-model="leds"></textarea>
       </div>
     </div>
     <br>
