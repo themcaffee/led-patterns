@@ -1,6 +1,6 @@
 # led-patterns
 
-Web application to easily create pixels of images or by painting with a cursor for use in a LED matrix. Has a configurable height and width and allows any image to be made into pixel art. 
+Web application to easily create pixels of images or by painting with a cursor for use in a LED matrix. Has a configurable height and width and allows any image to be made into pixel art. Try me out [here](https://led.mitchmcaffee.com)!
 
 ## Build Setup
 
